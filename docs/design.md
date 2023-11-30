@@ -12,14 +12,19 @@ The goal of Jots is to help people get everything they possibly can out of their
 
 Jots should support the following features:
 
-- [] Notes
-  - [] Text
-  - [] Images
-  - [] Media
-  - [] User Organization
-  - [] Sketches
-- [] Journal
-- [] Calendar
-  - [] Sync with other calendars
-- [] Self-hosting
-- [] Server hosting
+- [ ] Notes
+  - [ ] Text
+  - [ ] Images
+  - [ ] Media
+  - [ ] User Organization
+  - [ ] Sketches
+- [ ] Journal
+- [ ] Calendar
+  - [ ] Sync with other calendars
+- [ ] Self-hosting
+- [ ] Server hosting
+
+## Ideating
+
+#### 2023-11-26
+Here is my initial design: (images/sketch.jpg)[sketch]. Some would call it an artistic masterpiece, but really, its just a first look.
