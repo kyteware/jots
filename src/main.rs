@@ -39,9 +39,7 @@ fn sidebar<'a>() -> widget::Container<'a, Message> {
     let body = widget::Column::new()
         .push(sections())
         .push(widget::Rule::horizontal(10))
-        .push(widget::text("file 1"))
-        .push(widget::text("file 2"))
-        .push(widget::text("file 3"));
+        .push(explorer());
 
     widget::Container::new(body)
         .width(Length::Fixed(200.0))
@@ -60,4 +58,15 @@ fn sections<'a>() -> widget::Container<'a, Message> {
     widget::Container::new(body)
         .align_x(Horizontal::Center)
         .align_y(Vertical::Center)
+}
+
+fn explorer<'a>() -> widget::Container<'a, Message> {
+    let body = widget::Column::new()
+        .push(widget::text("file 1"))
+        .push(widget::text("file 2"))
+        .push(widget::text("file 3"));
+
+    widget::Container::new(body)
+        .width(Length::Fill)
+        .height(Length::Fill)
 }
