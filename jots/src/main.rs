@@ -1,5 +1,7 @@
 use iced::{Sandbox, Settings, widget, Length, alignment::{Vertical, Horizontal}};
 
+use jots_widgets::TreeList;
+
 fn main() {
     App::run(Settings::default()).unwrap();
 }
@@ -47,7 +49,7 @@ fn sidebar<'a>() -> widget::Container<'a, Message> {
 }
 
 fn sections<'a>() -> widget::Container<'a, Message> {
-    let paths = vec!["assets/logo.svg", "assets/notes.svg", "assets/journal.svg", "assets/calendar.svg"];
+    let paths = vec!["assets/logo.svg", "assets/notes.svg", "assets/journal.svg", "assets/calendar.svg", "assets/folder.svg"];
     let mut body = widget::Row::new();
 
     for path in paths {
