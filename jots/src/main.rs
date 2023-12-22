@@ -1,74 +1,80 @@
-use iced::{Sandbox, Settings, widget, Length, alignment::{Vertical, Horizontal}};
+use std::{io, sync::Arc, path::Path};
 
-use jots_widgets::TreeList;
+use iced::{
+    executor,
+    widget::{self, horizontal_space, text_editor},
+    Application, Command, Length, Settings, Theme,
+};
 
-fn main() {
-    App::run(Settings::default()).unwrap();
+fn main() -> iced::Result {
+    App::run(Settings::default())
 }
 
-struct App;
+struct App {
+    content: text_editor::Content,
+    error: Option<io::ErrorKind>,
+}
 
-impl Sandbox for App {
+#[derive(Debug, Clone)]
+enum Message {
+    Edit(text_editor::Action),
+    FileOpened(Result<Arc<String>, io::ErrorKind>),
+}
+
+impl Application for App {
     type Message = Message;
-    fn new() -> App {
-        App
+    type Theme = Theme;
+    type Executor = executor::Default;
+    type Flags = ();
+
+    fn new(flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        (
+            Self {
+                content: text_editor::Content::new(),
+                error: None,
+            },
+            Command::perform(load_file(format!("{}/src/main.rs", env!("CARGO_MANIFEST_DIR"))), Message::FileOpened)
+        )
     }
 
     fn title(&self) -> String {
         String::from("Hello World")
     }
 
-    fn update(&mut self, message: Self::Message) {
-        println!("Message: {:?}", message);
+    fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
+        match message {
+            Message::Edit(action) => self.content.edit(action),
+            Message::FileOpened(Ok(content)) => {
+                self.content = text_editor::Content::with(&content);
+            }
+            Message::FileOpened(Err(e)) => {
+                self.error = Some(e);
+            }
+        };
+        Command::none()
     }
 
     fn view(&self) -> iced::Element<Self::Message> {
-        widget::row!(
-            sidebar(),
-            widget::Rule::vertical(0),
-            widget::Space::new(10, Length::Fill),
-            widget::text("main content")
-        ).into()
+        let input = text_editor(&self.content).on_edit(Message::Edit);
+
+        let position = {
+            let (line, column) = self.content.cursor_position();
+
+            widget::Text::new(format!("{}:{}", line + 1, column + 1))
+        };
+
+        let status_bar = widget::row!(horizontal_space(Length::Fill), position);
+
+        widget::container(widget::column![input, status_bar].spacing(10))
+            .padding(10)
+            .into()
+    }
+
+    fn theme(&self) -> Theme {
+        Theme::Dark
     }
 }
 
-#[derive(Debug, Clone, Copy)]
-enum Message {
-    Hello
-}
-
-fn sidebar<'a>() -> widget::Container<'a, Message> {
-    let body = widget::Column::new()
-        .push(sections())
-        .push(widget::Rule::horizontal(10))
-        .push(explorer());
-
-    widget::Container::new(body)
-        .width(Length::Fixed(200.0))
-        .height(Length::Fill)
-}
-
-fn sections<'a>() -> widget::Container<'a, Message> {
-    let paths = vec!["assets/logo.svg", "assets/notes.svg", "assets/journal.svg", "assets/calendar.svg", "assets/folder.svg"];
-    let mut body = widget::Row::new();
-
-    for path in paths {
-        let handle = widget::svg::Handle::from_path(path);
-        body = body.push(widget::svg(handle));
-    }
-
-    widget::Container::new(body)
-        .align_x(Horizontal::Center)
-        .align_y(Vertical::Center)
-}
-
-fn explorer<'a>() -> widget::Container<'a, Message> {
-    let body = widget::Column::new()
-        .push(widget::text("file 1"))
-        .push(widget::text("file 2"))
-        .push(widget::text("file 3"));
-
-    widget::Container::new(body)
-        .width(Length::Fill)
-        .height(Length::Fill)
+async fn load_file(path: impl AsRef<Path>) -> Result<Arc<String>, io::ErrorKind> {
+    tokio::fs::read_to_string(path).await.map(Arc::new).map_err(|e| e.kind())
 }
