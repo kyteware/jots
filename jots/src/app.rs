@@ -1,4 +1,4 @@
-use std::{io, sync::Arc, fmt::Display, fmt::{Formatter, self}};
+use std::sync::Arc;
 
 use crate::error::Error;
 

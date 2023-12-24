@@ -12,7 +12,9 @@ pub async fn prep_data_dir() -> Result<(), Error> {
             .await
             .map_err(|e| Error::Fs(e.kind()))?;
     }
-    tokio::fs::create_dir_all(&jots_dir).await.map_err(|e| Error::Fs(e.kind()))?;
+    tokio::fs::create_dir_all(&jots_dir)
+        .await
+        .map_err(|e| Error::Fs(e.kind()))?;
     Ok(())
 }
 

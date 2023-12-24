@@ -1,5 +1,8 @@
 use core::fmt;
-use std::{io, fmt::{Display, Formatter}};
+use std::{
+    fmt::{Display, Formatter},
+    io,
+};
 
 #[derive(Debug, Clone)]
 pub enum Error {
