@@ -1,7 +1,6 @@
 use std::{path::Path, sync::Arc};
 
 use dirs::data_dir;
-use iced::Application;
 
 use crate::error::Error;
 
