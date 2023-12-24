@@ -1,15 +1,17 @@
 use std::sync::Arc;
 
 use crate::{
+    editor::{EditorMessage, EditorMode},
     error::Error,
     fs::load_file,
     sidebar::{NoteHeader, SidebarMode},
 };
 
-use iced::{executor, Application, Command, Theme};
+use iced::{executor, widget::{self, text_editor}, Application, Command, Theme};
 
 pub struct App {
     sidebar_mode: SidebarMode,
+    editor_mode: EditorMode,
 }
 
 #[derive(Debug, Clone)]
@@ -17,6 +19,7 @@ pub enum Message {
     NotesLoaded(Result<Vec<NoteHeader>, Error>),
     OpenNote(NoteHeader),
     NoteOpened(Result<(NoteHeader, Arc<String>), Error>),
+    Editor(EditorMessage),
 }
 
 impl Application for App {
@@ -27,7 +30,14 @@ impl Application for App {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let (sidebar_mode, note_load) = SidebarMode::load();
-        (Self { sidebar_mode }, note_load)
+        let editor_mode = EditorMode::new();
+        (
+            Self {
+                sidebar_mode,
+                editor_mode,
+            },
+            note_load,
+        )
     }
 
     fn title(&self) -> String {
@@ -47,8 +57,10 @@ impl Application for App {
                     Err(res.unwrap_err())
                 })
             }),
-            Message::NoteOpened(Ok((note, contents))) => {
-                dbg!(note, contents);
+            Message::NoteOpened(Ok((_note, contents))) => {
+                self.editor_mode = EditorMode::Text {
+                    content: Some(text_editor::Content::with(contents.as_str())),
+                };
                 Command::none()
             }
 
@@ -61,12 +73,14 @@ impl Application for App {
                 eprintln!("Error opening note: {}", e);
                 Command::none()
             }
+            Message::Editor(msg) => self.editor_mode.update(msg),
         }
     }
 
     fn view(&self) -> iced::Element<Self::Message> {
         let sidebar = self.sidebar_mode.view();
-        sidebar.into()
+        let editor = self.editor_mode.view();
+        widget::row![sidebar, editor].spacing(10).into()
     }
 
     fn theme(&self) -> Theme {

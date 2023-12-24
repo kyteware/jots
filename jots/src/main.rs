@@ -1,4 +1,5 @@
 mod app;
+mod editor;
 mod error;
 mod fs;
 mod sidebar;
