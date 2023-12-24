@@ -1,4 +1,6 @@
-use std::{io, sync::Arc};
+use std::{io, sync::Arc, fmt::Display, fmt::{Formatter, self}};
+
+use crate::error::Error;
 
 use iced::{
     executor,
@@ -81,10 +83,4 @@ impl Application for App {
     fn theme(&self) -> Theme {
         Theme::Dark
     }
-}
-
-#[derive(Debug, Clone)]
-pub enum Error {
-    DialogClosed,
-    Io(io::ErrorKind),
 }
