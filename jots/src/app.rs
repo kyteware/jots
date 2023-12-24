@@ -1,14 +1,12 @@
-use std::{sync::Arc, path::PathBuf};
+use std::sync::Arc;
 
-use crate::{error::Error, sidebar::{SidebarMode, self, NoteHeader}, fs::load_file};
-
-use iced::{
-    executor,
-    widget::{self, horizontal_space, text_editor},
-    Application, Command, Length, Theme,
+use crate::{
+    error::Error,
+    fs::load_file,
+    sidebar::{NoteHeader, SidebarMode},
 };
 
-use crate::fs::pick_file;
+use iced::{executor, Application, Command, Theme};
 
 pub struct App {
     sidebar_mode: SidebarMode,
@@ -29,10 +27,7 @@ impl Application for App {
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
         let (sidebar_mode, note_load) = SidebarMode::load();
-        (
-            Self { sidebar_mode },
-            note_load,
-        )
+        (Self { sidebar_mode }, note_load)
     }
 
     fn title(&self) -> String {
@@ -45,11 +40,13 @@ impl Application for App {
                 self.sidebar_mode = SidebarMode::Notes { notes };
                 Command::none()
             }
-            Message::OpenNote(note) => {
-                Command::perform(load_file(note.path.clone()), |res| Message::NoteOpened(if let Ok(contents) = res {
+            Message::OpenNote(note) => Command::perform(load_file(note.path.clone()), |res| {
+                Message::NoteOpened(if let Ok(contents) = res {
                     Ok((note, contents))
-                } else { Err(res.unwrap_err()) }))
-            }
+                } else {
+                    Err(res.unwrap_err())
+                })
+            }),
             Message::NoteOpened(Ok((note, contents))) => {
                 dbg!(note, contents);
                 Command::none()

@@ -17,16 +17,6 @@ pub async fn prep_data_dir() -> Result<(), Error> {
     Ok(())
 }
 
-pub async fn pick_file() -> Result<Arc<String>, Error> {
-    let handle = rfd::AsyncFileDialog::new()
-        .set_title("Pick a text file")
-        .pick_file()
-        .await
-        .ok_or(Error::DialogClosed)?;
-
-    load_file(handle.path()).await
-}
-
 pub async fn load_file(path: impl AsRef<Path>) -> Result<Arc<String>, Error> {
     tokio::fs::read_to_string(path)
         .await
@@ -42,15 +32,8 @@ pub async fn load_notes() -> Result<Vec<NoteHeader>, Error> {
         .map_err(|e| Error::Fs(e.kind()))?;
     while let Some(entry) = dir.next_entry().await.map_err(|e| Error::Fs(e.kind()))? {
         let path = entry.path();
-        let title = path
-            .file_name()
-            .unwrap()
-            .to_string_lossy()
-            .to_string();
-        notes.push(NoteHeader {
-            title,
-            path,
-        });
+        let title = path.file_name().unwrap().to_string_lossy().to_string();
+        notes.push(NoteHeader { title, path });
     }
     Ok(notes)
 }

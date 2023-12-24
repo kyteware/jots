@@ -6,7 +6,6 @@ use std::{
 
 #[derive(Debug, Clone)]
 pub enum Error {
-    DialogClosed,
     Fs(io::ErrorKind),
     NoDataDir,
 }
