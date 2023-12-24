@@ -1,6 +1,6 @@
-use std::sync::Arc;
+use std::{sync::Arc, path::PathBuf};
 
-use crate::error::Error;
+use crate::{error::Error, sidebar::{SidebarMode, self, NoteHeader}, fs::load_file};
 
 use iced::{
     executor,
@@ -8,18 +8,17 @@ use iced::{
     Application, Command, Length, Theme,
 };
 
-use crate::fs::{load_file, pick_file};
+use crate::fs::pick_file;
 
 pub struct App {
-    content: text_editor::Content,
-    error: Option<Error>,
+    sidebar_mode: SidebarMode,
 }
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    Edit(text_editor::Action),
-    Open,
-    FileOpened(Result<Arc<String>, Error>),
+    NotesLoaded(Result<Vec<NoteHeader>, Error>),
+    OpenNote(NoteHeader),
+    NoteOpened(Result<(NoteHeader, Arc<String>), Error>),
 }
 
 impl Application for App {
@@ -29,15 +28,10 @@ impl Application for App {
     type Flags = ();
 
     fn new(_flags: Self::Flags) -> (Self, Command<Self::Message>) {
+        let (sidebar_mode, note_load) = SidebarMode::load();
         (
-            Self {
-                content: text_editor::Content::new(),
-                error: None,
-            },
-            Command::perform(
-                load_file(format!("{}/src/main.rs", env!("CARGO_MANIFEST_DIR"))),
-                Message::FileOpened,
-            ),
+            Self { sidebar_mode },
+            note_load,
         )
     }
 
@@ -47,37 +41,35 @@ impl Application for App {
 
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
         match message {
-            Message::Edit(action) => {
-                self.content.edit(action);
+            Message::NotesLoaded(Ok(notes)) => {
+                self.sidebar_mode = SidebarMode::Notes { notes };
                 Command::none()
             }
-            Message::FileOpened(Ok(content)) => {
-                self.content = text_editor::Content::with(&content);
+            Message::OpenNote(note) => {
+                Command::perform(load_file(note.path.clone()), |res| Message::NoteOpened(if let Ok(contents) = res {
+                    Ok((note, contents))
+                } else { Err(res.unwrap_err()) }))
+            }
+            Message::NoteOpened(Ok((note, contents))) => {
+                dbg!(note, contents);
                 Command::none()
             }
-            Message::FileOpened(Err(e)) => {
-                self.error = Some(e);
+
+            // TODO: Handle errors
+            Message::NotesLoaded(Err(e)) => {
+                eprintln!("Error loading notes: {}", e);
                 Command::none()
             }
-            Message::Open => Command::perform(pick_file(), Message::FileOpened),
+            Message::NoteOpened(Err(e)) => {
+                eprintln!("Error opening note: {}", e);
+                Command::none()
+            }
         }
     }
 
     fn view(&self) -> iced::Element<Self::Message> {
-        let controls = widget::row![widget::button("Open").on_press(Message::Open)];
-        let input = text_editor(&self.content).on_edit(Message::Edit);
-
-        let position = {
-            let (line, column) = self.content.cursor_position();
-
-            widget::Text::new(format!("{}:{}", line + 1, column + 1))
-        };
-
-        let status_bar = widget::row!(horizontal_space(Length::Fill), position);
-
-        widget::container(widget::column![controls, input, status_bar].spacing(10))
-            .padding(10)
-            .into()
+        let sidebar = self.sidebar_mode.view();
+        sidebar.into()
     }
 
     fn theme(&self) -> Theme {
