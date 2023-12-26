@@ -63,6 +63,7 @@ impl Application for App {
                 };
                 Command::none()
             }
+            Message::Editor(msg) => self.editor_mode.update(msg),
 
             // TODO: Handle errors
             Message::NotesLoaded(Err(e)) => {
@@ -73,14 +74,18 @@ impl Application for App {
                 eprintln!("Error opening note: {}", e);
                 Command::none()
             }
-            Message::Editor(msg) => self.editor_mode.update(msg),
         }
     }
 
     fn view(&self) -> iced::Element<Self::Message> {
         let sidebar = self.sidebar_mode.view();
         let editor = self.editor_mode.view();
-        widget::row![sidebar, editor].spacing(10).into()
+
+        let sep = widget::vertical_rule(10);
+        let full_content = widget::row![sidebar, sep, editor].spacing(10);
+        widget::container(full_content)
+            .padding(10)
+            .into()
     }
 
     fn theme(&self) -> Theme {
