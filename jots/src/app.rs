@@ -7,7 +7,11 @@ use crate::{
     sidebar::{NoteHeader, SidebarMode},
 };
 
-use iced::{executor, widget::{self, text_editor}, Application, Command, Theme};
+use iced::{
+    executor,
+    widget::{self, text_editor},
+    Application, Command, Theme,
+};
 
 pub struct App {
     sidebar_mode: SidebarMode,
@@ -83,9 +87,7 @@ impl Application for App {
 
         let sep = widget::vertical_rule(10);
         let full_content = widget::row![sidebar, sep, editor].spacing(10);
-        widget::container(full_content)
-            .padding(10)
-            .into()
+        widget::container(full_content).padding(10).into()
     }
 
     fn theme(&self) -> Theme {
