@@ -23,23 +23,24 @@ mod tests {
 
     #[test]
     fn test_paragraphs_2newlines_end() {
-        let input = "This is a paragraph.\n\nThis is another paragraph.\n\n";
+        let input = "This is a paragraph.\n\nThis is another paragraph.\n\nAnother paragraph!\n\n";
         let expected = vec![
             JdElement::Paragraph("This is a paragraph."),
-            JdElement::Paragraph("This is another paragraph.")
+            JdElement::Paragraph("This is another paragraph."),
+            JdElement::Paragraph("Another paragraph!")
         ];
-        let (input, output) = parse_jotdown(input).unwrap();
+        let (_, output) = parse_jotdown(input).unwrap();
         assert_eq!(output, expected);
     }
 
     #[test]
-    fn test_paragraphs_2newlines_noend() {
+    fn test_paragraphs_noend() {
         let input = "This is a paragraph.\n\nThis is another paragraph.\n";
         let expected = vec![
             JdElement::Paragraph("This is a paragraph."),
             JdElement::Paragraph("This is another paragraph.")
         ];
-        let (input, output) = parse_jotdown(input).unwrap();
+        let (_, output) = parse_jotdown(input).unwrap();
         assert_eq!(output, expected);
     }
 }

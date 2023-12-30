@@ -5,8 +5,13 @@ Jotdown is a docuent format similar to markdown, give or take some features
 ## Spec
 
 Blocks:
-- Paragraphs: `\n\n` seperated text blocks (ignore single `\n`, shrink more than two newlines as to not include them in the paragraph). Only paragraphs support text modifiers
-- Titles/Headers: `#` - `######` Single line, doesn't support special
+- Paragraphs: `\n\n` seperated single line text blocks. 
+  - No hard wrapping. 
+  - If single `\n` encountered, seperate into two paragraphs (not recommened but could happen from bad user)
+  - Shrink more than two newlines as to not include them in the next paragraph/block.
+  - Only paragraphs support text modifiers
+  - Ignore starting whitespace (spaces, tabs)
+- Titles/Headers: `#` - `######` Single line, doesn't support modifiers
 (Add more later)
 
 Text modifiers:
