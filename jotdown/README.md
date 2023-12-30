@@ -11,7 +11,7 @@ Blocks:
   - Shrink more than two newlines as to not include them in the next paragraph/block.
   - Only paragraphs support text modifiers
   - Ignore starting whitespace (spaces, tabs)
-- Titles/Headers: `#` - `######` Single line, doesn't support modifiers
+- Titles/Headings: `#` - `######` Single line, doesn't support modifiers
 (Add more later)
 
 Text modifiers:

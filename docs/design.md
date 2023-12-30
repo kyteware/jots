@@ -30,10 +30,10 @@ Jots should support the following features:
 Here is my initial design: (images/sketch.jpg)[sketch]. Some would call it an artistic masterpiece, but really, its just a first look.
 
 #### 2023-12-26
-Wow, its been a whole month. Incredible. Anyways, I've been thinking about how to store my notes and I've decided to create my own format based on markdown (`.md`) called jotdown (`.jd`). It will describe titles, headers, bold text and other variations in the same way, but reference other files differently.
+Wow, its been a whole month. Incredible. Anyways, I've been thinking about how to store my notes and I've decided to create my own format based on markdown (`.md`) called jotdown (`.jd`). It will describe titles, headings, bold text and other variations in the same way, but reference other files differently.
 
 Parity with md:
-- Titles/headers: `# Title` -> `# Very small header`
+- Titles/headings: `# Title` -> `# Very small heading`
 - Bold/Italics/Spoilers: `*italics*, **bold**, etc`
 
 Differences:

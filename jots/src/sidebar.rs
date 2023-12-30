@@ -5,7 +5,7 @@ use iced::{widget, Command, Element};
 use crate::{app::Message, fs::load_notes};
 
 pub enum SidebarMode {
-    Notes { notes: Vec<NoteHeader> },
+    Notes { notes: Vec<NoteHeading> },
 }
 
 impl SidebarMode {
@@ -35,7 +35,7 @@ impl SidebarMode {
 }
 
 #[derive(Debug, Clone)]
-pub struct NoteHeader {
+pub struct NoteHeading {
     pub title: String,
     pub path: PathBuf,
 }

@@ -4,7 +4,7 @@ use crate::{
     editor::{EditorMessage, EditorMode},
     error::Error,
     fs::load_file,
-    sidebar::{NoteHeader, SidebarMode},
+    sidebar::{NoteHeading, SidebarMode},
 };
 
 use iced::{
@@ -20,9 +20,9 @@ pub struct App {
 
 #[derive(Debug, Clone)]
 pub enum Message {
-    NotesLoaded(Result<Vec<NoteHeader>, Error>),
-    OpenNote(NoteHeader),
-    NoteOpened(Result<(NoteHeader, Arc<String>), Error>),
+    NotesLoaded(Result<Vec<NoteHeading>, Error>),
+    OpenNote(NoteHeading),
+    NoteOpened(Result<(NoteHeading, Arc<String>), Error>),
     Editor(EditorMessage),
 }
 
