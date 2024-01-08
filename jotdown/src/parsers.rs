@@ -1,9 +1,9 @@
 use nom::{
-    bytes::complete::take_while1,
-    character::complete::{multispace0, multispace1, not_line_ending},
+    bytes::complete::{take_while1, tag},
+    character::complete::{multispace0, multispace1, not_line_ending, line_ending},
     error::Error,
     sequence::tuple,
-    Err, IResult,
+    Err, IResult, multi::many1, combinator::opt,
 };
 
 pub fn parse_paragraph(input: &str) -> IResult<&str, &str> {
@@ -31,7 +31,18 @@ fn heading_tag(input: &str) -> IResult<&str, u8> {
     Ok((input, num_hashtags))
 }
 
-pub fn not_line_ending1(input: &str) -> IResult<&str, &str> {
+pub fn parse_unordered_list(input: &str) -> IResult<&str, Vec<&str>> {
+    let (input, list) = many1(parse_unordered_list_entry)(input)?;
+    Ok((input, list))
+}
+
+fn parse_unordered_list_entry(input: &str) -> IResult<&str, &str> {
+    let (input, (_, content, _)) =
+        tuple((tag("- "), not_line_ending, opt(line_ending)))(input)?;
+    Ok((input, content))
+}
+
+fn not_line_ending1(input: &str) -> IResult<&str, &str> {
     let (input, paragraph) = not_line_ending(input)?;
     if paragraph.is_empty() {
         return Err(Err::Error(Error::new(input, nom::error::ErrorKind::NoneOf)));
