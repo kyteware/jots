@@ -1,13 +1,13 @@
 //! Parsers should follow the following rules:
 //! - Consume all leading whitespace
-//! - Consume no trailing whitespace
+//! - Consume no trailing whitespace (consuming the immediately following newline is fine)
 
 use nom::{
     bytes::complete::{take_while1, tag},
-    character::complete::{multispace0, multispace1, not_line_ending, line_ending, u64 as nom_u64, space0},
+    character::complete::{multispace1, not_line_ending, line_ending, u64 as nom_u64, space0},
     error::Error,
     sequence::{tuple, terminated},
-    Err, IResult, multi::{many1, many0}, combinator::opt,
+    Err, IResult, multi::{many1, many0}, combinator::{opt, eof}, branch::alt,
 };
 
 pub fn parse_paragraph(input: &str) -> IResult<&str, &str> {
@@ -42,6 +42,12 @@ pub fn parse_unordered_list(input: &str) -> IResult<&str, Vec<&str>> {
 }
 
 fn parse_unordered_list_entry(input: &str) -> IResult<&str, &str> {
+    if parse_checklist_entry(input).is_ok() {
+        return Err(Err::Error(Error::new(
+            input,
+            nom::error::ErrorKind::IsA,
+        )));
+    }
     let (input, (_, content, _)) =
         tuple((tag("- "), not_line_ending, opt(line_ending)))(input)?;
     Ok((input, content))
@@ -74,6 +80,19 @@ fn parse_ordered_list_entry(input: &str) -> IResult<&str, (u64, &str)> {
     Ok((input, (num, content)))
 }
 
+pub fn parse_checklist(input: &str) -> IResult<&str, Vec<(&str, bool)>> {
+    let (input, _) = many0(empty_line)(input)?;
+    let (input, list) = many1(parse_checklist_entry)(input)?;
+    Ok((input, list))
+}
+
+fn parse_checklist_entry(input: &str) -> IResult<&str, (&str, bool)> {
+    let (input, (_, check, _, content, _)) =
+        tuple((tag("- ["), alt((tag("x"), tag(" "))), tag("] "), not_line_ending, opt(line_ending)))(input)?;
+    let checked = check == "x";
+    dbg!(Ok((input, (content, checked))))
+}
+
 fn not_line_ending1(input: &str) -> IResult<&str, &str> {
     let (input, paragraph) = not_line_ending(input)?;
     if paragraph.is_empty() {
@@ -83,5 +102,5 @@ fn not_line_ending1(input: &str) -> IResult<&str, &str> {
 }
 
 fn empty_line(input: &str) -> IResult<&str, &str> {
-    terminated(space0, line_ending)(input)
+    alt((terminated(space0, line_ending), terminated(space0, eof)))(input)
 }
