@@ -5,5 +5,6 @@ pub enum JdElement<'a> {
     Checklist(Vec<(&'a str, bool)>),
     UnorderedList(Vec<&'a str>),
     OrderedList(Vec<&'a str>),
+    Embed(&'a str),
     Paragraph(&'a str),
 }

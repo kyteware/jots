@@ -300,3 +300,61 @@ fn checklist_and_checklist() {
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }
+
+#[test]
+fn embed() {
+    let input = "[https://www.youtube.com/watch?v=dQw4w9WgXcQ]";
+    let expected = vec![JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ")];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test] 
+fn paragraph_and_embed() {
+    let input = "This is a paragraph.\n\n[https://www.youtube.com/watch?v=dQw4w9WgXcQ]";
+    let expected = vec![
+        JdElement::Paragraph("This is a paragraph."),
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn list_embed_other_list() {
+    let input = "- [ ] This is a list item\n- [x] This is another list item\n[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n- This is a list item\n- This is another list item\n";
+    let expected = vec![
+        JdElement::Checklist(vec![
+            ("This is a list item", false),
+            ("This is another list item", true),
+        ]),
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        JdElement::UnorderedList(vec!["This is a list item", "This is another list item"]),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn several_embeds() {
+    let input = "[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n";
+    let expected = vec![
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn title_paragraph_embed() {
+    let input = "# This is a title\n\nThis is a paragraph.\n\n[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n";
+    let expected = vec![
+        JdElement::TitleOrHeading(("This is a title", 1)),
+        JdElement::Paragraph("This is a paragraph."),
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
