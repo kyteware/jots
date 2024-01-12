@@ -56,46 +56,46 @@ fn header() {
     assert_eq!(output, expected);
 }
 
-// #[test]
-// fn titles() {
-//     let input = "# This is a title\n\n\nThis is a paragraph.\n\n# This is another title\n";
-//     let expected = vec![
-//         JdElement::TitleOrHeading(("This is a title", 1)),
-//         JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
-//         JdElement::TitleOrHeading(("This is another title", 1)),
-//     ];
-//     let (_, output) = parse_jotdown(input).unwrap();
-//     assert_eq!(output, expected);
-// }
+#[test]
+fn titles() {
+    let input = "# This is a title\n\n\nThis is a paragraph.\n\n# This is another title\n";
+    let expected = vec![
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This is a title")], 1)),
+        JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This is another title")], 1)),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
 
-// #[test]
-// fn paragraph_startswith_hashtag() {
-//     let input = "#This is not a header";
-//     let expected = vec![JdElement::Paragraph(vec![JdTextMod::Normal("#This is not a header")])];
-//     let (_, output) = parse_jotdown(input).unwrap();
-//     assert_eq!(output, expected);
-// }
+#[test]
+fn paragraph_startswith_hashtag() {
+    let input = "#This is not a header";
+    let expected = vec![JdElement::Paragraph(vec![JdTextMod::Normal("#This is not a header")])];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
 
-// #[test]
-// fn unordered_list() {
-//     let input = "- This is a list item\n- This is another list item\n";
-//     let expected = vec![
-//         JdElement::UnorderedList(vec!["This is a list item", "This is another list item"]),
-//     ];
-//     let (_, output) = parse_jotdown(input).unwrap();
-//     assert_eq!(output, expected);
-// }
+#[test]
+fn unordered_list() {
+    let input = "- This is a list item\n- This is another list item\n";
+    let expected = vec![
+        JdElement::UnorderedList(vec![vec![JdTextMod::Normal("This is a list item")], vec![JdTextMod::Normal("This is another list item")]]),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
 
-// #[test]
-// fn paragraph_and_unordered_list() {
-//     let input = "This is a paragraph.\n\n- This is a list item\n- This is another list item\n";
-//     let expected = vec![
-//         JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
-//         JdElement::UnorderedList(vec!["This is a list item", "This is another list item"]),
-//     ];
-//     let (_, output) = parse_jotdown(input).unwrap();
-//     assert_eq!(output, expected);
-// }
+#[test]
+fn paragraph_and_unordered_list() {
+    let input = "This is a paragraph.\n\n- This is a list item\n- This is another list item\n";
+    let expected = vec![
+        JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
+        JdElement::UnorderedList(vec![vec![JdTextMod::Normal("This is a list item")], vec![JdTextMod::Normal("This is another list item")]]),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
 
 // #[test]
 // fn unordered_list_and_paragraph() {
