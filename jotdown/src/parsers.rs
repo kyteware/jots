@@ -120,6 +120,7 @@ pub fn parse_code_block(input: &str) -> IResult<&str, (&str, Option<&str>)> {
         take_until("```"),
         tag("```"),
     ))(input)?;
+    let (input, _) = many0(empty_line)(input)?;
     Ok((input, (code, lang)))
 }
 
