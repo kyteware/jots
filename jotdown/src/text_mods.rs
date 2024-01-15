@@ -94,6 +94,7 @@ fn normal(input: &str) -> IResult<&str, &str> {
     Ok(res)
 }
 
+/// assumes that a and b are valid utf8
 fn merge_two_strs<'a>(a: &'a str, b: &'a str) -> &'a str {
     let start = a.as_ptr();
     let b_start = b.as_ptr();
