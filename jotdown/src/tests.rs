@@ -358,3 +358,46 @@ fn title_paragraph_embed() {
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }
+
+#[test]
+fn title_formatted() {
+    let input = "# This is a **bold**, but *itatic title*\n\n## This header has `raw text` in it";
+
+    let expected = vec![
+        JdElement::TitleOrHeading((
+            vec![
+                JdTextMod::Normal("This is a "),
+                JdTextMod::Bold("bold"),
+                JdTextMod::Normal(", but "),
+                JdTextMod::Italic("itatic title"),
+            ],
+            1,
+        )),
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This header has "), JdTextMod::Raw("raw text"), JdTextMod::Normal(" in it")], 2)),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn checklist_formatted() {
+    let input = "- [ ] This is a **bold**, but *itatic checkbox*\n- [x] This marked checkbox has `raw text` in it";
+
+    let expected = vec![JdElement::Checklist(vec![
+        (
+            vec![
+                JdTextMod::Normal("This is a "),
+                JdTextMod::Bold("bold"),
+                JdTextMod::Normal(", but "),
+                JdTextMod::Italic("itatic checkbox"),
+            ],
+            false,
+        ),
+        (
+            vec![JdTextMod::Normal("This marked checkbox has "), JdTextMod::Raw("raw text"), JdTextMod::Normal(" in it")],
+            true,
+        ),
+    ])];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
