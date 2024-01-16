@@ -40,4 +40,5 @@ Differences:
 No html support
 Text retains tabs and newlines
 
-
+### 2023-1-16
+Just finished (everything for now at least) the jotdown parser, and it worked out pretty well. My favorite part is that it has NO INVALID STATE! Very cool. Anyways, now that I'm done working that out I'm going to move on to making an editor for it. Before I do that thought, I'm going to make a reverse parser that deserialized jotdown back into text.
