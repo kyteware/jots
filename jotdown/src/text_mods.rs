@@ -3,7 +3,7 @@ use std::slice;
 use nom::{
     branch::alt,
     bytes::complete::{take_while1, take_until1},
-    bytes::complete::{tag, take},
+    bytes::complete::{tag, take, take_while},
     combinator::map,
     sequence::delimited,
     IResult, character::complete::not_line_ending
@@ -85,8 +85,9 @@ fn reference(input: &str) -> IResult<&str, (&str, &str)> {
 }
 
 fn normal(input: &str) -> IResult<&str, &str> {
-    let (new_input, non_delims) = take_while1(|c| c != '*' && c != '`' && c != '[')(input)?;
+    let (new_input, non_delims) = take_while(|c| c != '*' && c != '`' && c != '[')(input)?;
     let res = if non_delims.is_empty() {
+        dbg!("non_delims is empty");
         take(1usize)(input)?
     } else {
         (new_input, non_delims)
@@ -104,17 +105,17 @@ fn normal(input: &str) -> IResult<&str, &str> {
 // }
 
 fn merge_two_strs<'a>(a: &'a str, b: &'a str) -> &'a str {
-    let start = a.as_ptr();
+    let a_start = a.as_ptr();
     let b_start = b.as_ptr();
-    if (b_start as usize) < (start as usize) {
+    if (b_start as usize) < (a_start as usize) {
         panic!("str b must begin after str a")
     }
-    if b_start as usize - start as usize != a.len() {
+    if b_start as usize - a_start as usize != a.len() {
         panic!("Cannot merge two strings that are not adjacent in memory");
     }
     let len = a.len() + b.len();
     unsafe {
-        let s = slice::from_raw_parts(start, len);
+        let s = slice::from_raw_parts(a_start, len);
         std::str::from_utf8_unchecked(s)
     }
 }
@@ -122,6 +123,22 @@ fn merge_two_strs<'a>(a: &'a str, b: &'a str) -> &'a str {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn merge_strs_normal() {
+        let og = "helloworld".to_string();
+        let a = &og[1..5];
+        let b = &og[5..];
+        assert_eq!(merge_two_strs(a, b), "elloworld");
+    }
+
+    #[test]
+    fn merge_strs_emojis() {
+        let og = "hi✋🏿hello✋🏿".to_string();
+        let a = &og[1..5];
+        let b = &og[5..];
+        assert_eq!(merge_two_strs(a, b), "i✋🏿hello✋🏿");
+    }
 
     #[test]
     fn test_bold() {

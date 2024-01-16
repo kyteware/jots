@@ -401,3 +401,31 @@ fn checklist_formatted() {
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }
+
+#[test]
+fn formatting_with_emojis() {
+    let input = "This is a **bold**, but *itatic title*✋🏿\n\n## This header has `raw text` in it";
+
+    let expected = vec![
+        JdElement::Paragraph(vec![
+            JdTextMod::Normal("This is a "),
+            JdTextMod::Bold("bold"),
+            JdTextMod::Normal(", but "),
+            JdTextMod::Italic("itatic title"),
+            JdTextMod::Normal("✋🏿"),
+        ]),
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This header has "), JdTextMod::Raw("raw text"), JdTextMod::Normal(" in it")], 2)),
+    ];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn formatting_with_unused_symbols() {
+    let input = "Here is an unused * and an unused `";
+    let expected = vec![JdElement::Paragraph(vec![
+        JdTextMod::Normal("Here is an unused * and an unused `"),
+    ])];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
