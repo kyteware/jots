@@ -416,6 +416,43 @@ fn formatting_with_emojis() {
         ]),
         JdElement::TitleOrHeading((vec![JdTextMod::Normal("This header has "), JdTextMod::Raw("raw text"), JdTextMod::Normal(" in it")], 2)),
     ];
+
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn code_block() {
+    let input = "```\nThis is a code block\n```\n";
+    let expected = vec![JdElement::CodeBlock(("This is a code block\n", None))];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn code_block_python() {
+    let input = "```python\nprint('This is a code block')\n```\n";
+    let expected = vec![JdElement::CodeBlock(("print('This is a code block')\n", Some("python")))];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn multiline_code_block() {
+    let input = "```\nThis is a code block\nThis is a code block\n```\n";
+    let expected = vec![JdElement::CodeBlock(("This is a code block\nThis is a code block\n", None))];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+
+}
+
+#[test]
+fn code_block_and_paragraph() {
+    let input = "```\nThis is a code block\n```\n\n**This is bold text**\n";
+    let expected = vec![
+        JdElement::CodeBlock(("This is a code block\n", None)),
+        JdElement::Paragraph(vec![JdTextMod::Bold("This is bold text")]),
+    ];
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }
@@ -426,6 +463,17 @@ fn formatting_with_unused_symbols() {
     let expected = vec![JdElement::Paragraph(vec![
         JdTextMod::Normal("Here is an unused * and an unused `"),
     ])];
+    let (_, output) = parse_jotdown(input).unwrap();
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn title_and_code_block() {
+    let input = "# This is a title\n\n```\nThis is a code block\n```\n";
+    let expected = vec![
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This is a title")], 1)),
+        JdElement::CodeBlock(("This is a code block\n", None)),
+    ];
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }

@@ -95,15 +95,7 @@ fn normal(input: &str) -> IResult<&str, &str> {
     Ok(res)
 }
 
-// fn one_lined(input: &str) -> IResult<&str, &str> {
-//     let (input, _) = not_line_ending(input)?;
-//     if !input.is_empty() {
-//         Err(Err::Error(Error::new(input, nom::error::ErrorKind::Not)))
-//     } else {
-//         Ok((input, ""))
-//     }
-// }
-
+/// assumes that a and b are valid utf8
 fn merge_two_strs<'a>(a: &'a str, b: &'a str) -> &'a str {
     let a_start = a.as_ptr();
     let b_start = b.as_ptr();
