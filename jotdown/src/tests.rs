@@ -477,3 +477,133 @@ fn title_and_code_block() {
     let (_, output) = parse_jotdown(input).unwrap();
     assert_eq!(output, expected);
 }
+
+#[test]
+fn unparse_paragraph() {
+    let input = vec![JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")])];
+    let expected = "This is a paragraph.\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_title() {
+    let input = vec![JdElement::TitleOrHeading((vec![JdTextMod::Normal("This is a title")], 1))];
+    let expected = "# This is a title\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_heading_and_paragraph() {
+    let input = vec![
+        JdElement::TitleOrHeading((vec![JdTextMod::Normal("This is a heading")], 3)),
+        JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
+    ];
+    let expected = "### This is a heading\n\nThis is a paragraph.\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_code_block() {
+    let input = vec![JdElement::CodeBlock(("This is a code block\n", None))];
+    let expected = "```\nThis is a code block\n```\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_rust_code_block() {
+    let input = vec![JdElement::Paragraph(vec![JdTextMod::Normal("Checkout this cool code block!")]), JdElement::CodeBlock(("fn main() {\n\n}\n", Some("rust")))];
+    let expected = "Checkout this cool code block!\n\n```rust\nfn main() {\n\n}\n```\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_unordered_list() {
+    let input = vec![JdElement::UnorderedList(vec![vec![JdTextMod::Normal("This is a list item")], vec![JdTextMod::Normal("This is another list item")]])];
+    let expected = "- This is a list item\n- This is another list item\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_ordered_list() {
+    let input = vec![JdElement::OrderedList(vec![vec![JdTextMod::Normal("This is a list item")], vec![JdTextMod::Normal("This is another list item")]])];
+    let expected = "1. This is a list item\n2. This is another list item\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_checklist() {
+    let input = vec![JdElement::Checklist(vec![
+        (vec![JdTextMod::Normal("This is a list item")], false),
+        (vec![JdTextMod::Normal("This is another list item")], true),
+    ])];
+    let expected = "- [ ] This is a list item\n- [x] This is another list item\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_embed() {
+    let input = vec![JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ")];
+    let expected = "[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_embed_and_paragraph() {
+    let input = vec![
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        JdElement::Paragraph(vec![JdTextMod::Normal("This is a paragraph.")]),
+    ];
+    let expected = "[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n\nThis is a paragraph.\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_embed_and_code_block() {
+    let input = vec![
+        JdElement::Embed("https://www.youtube.com/watch?v=dQw4w9WgXcQ"),
+        JdElement::CodeBlock(("This is a code block\n", None)),
+    ];
+    let expected = "[https://www.youtube.com/watch?v=dQw4w9WgXcQ]\n\n```\nThis is a code block\n```\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn unparse_formatted_text() {
+    let input = vec![JdElement::Paragraph(vec![
+        JdTextMod::Normal("This is a "),
+        JdTextMod::Bold("bold"),
+        JdTextMod::Normal(" and "),
+        JdTextMod::Italic("italic"),
+        JdTextMod::Normal(" text."),
+    ])];
+    let expected = "This is a **bold** and *italic* text.\n";
+    let output = unparse_jotdown(&input);
+    assert_eq!(output, expected);
+}
+
+#[test]
+fn big_roundtrip() {
+    let input = "# This is a title\n\nThis is a paragraph.\n\n- This is a list item\n- This is another list item\n\nThis is another paragraph.\n";
+    let (_, output) = parse_jotdown(input).unwrap();
+    let output = unparse_jotdown(&output);
+    assert_eq!(output, input);
+}
+
+#[test]
+fn code_doc_roundtrip() {
+    let input = "# A cool code doc\n\nThis is my favorite cool code\n\n```rust\nfn cool(c: bool) {\n    if c {\n        println!(\"cool\");\n    }\n}\n```\n";
+    let (_, output) = parse_jotdown(input).unwrap();
+    let output = unparse_jotdown(&output);
+    assert_eq!(output, input);
+}
