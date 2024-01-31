@@ -42,3 +42,11 @@ Text retains tabs and newlines
 
 ### 2023-1-16
 Just finished (everything for now at least) the jotdown parser, and it worked out pretty well. My favorite part is that it has NO INVALID STATE! Very cool. Anyways, now that I'm done working that out I'm going to move on to making an editor for it. Before I do that thought, I'm going to make a reverse parser that deserialized jotdown back into text.
+
+### 2023-2-29
+I took a little break from this to work on some stuff for Wayland, but I'm now working on the editor. I've run into a bit of an issue with `iced`, which is that the `text_editor` widget always wants to extend as big as it can. I want it to hug its contents.
+
+### 2023-2-31
+I DID IT. https://github.com/iced-rs/iced/pull/2221 it was pretty simple in retrospect. I'm now going to get back to my app now :D
+
+
