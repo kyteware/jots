@@ -6,9 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-anyhow = "1.0.76"
 dirs = "5.0.1"
-iced = { git = "https://github.com/iced-rs/iced.git", rev = "refs/tags/text-editor", features = ["debug"] }
-rfd = "0.12.1"
-
-tokio = { version = "1.32", features = ["full"] }
+# iced = { git = "https://github.com/iced-rs/iced.git", features = ["debug", "tokio"] }
+iced = { version = "*", features = ["debug", "tokio"] }
+tokio = { version = "1.35", features = ["full"] }
+jotdown = { path = "../jotdown" }

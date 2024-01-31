@@ -1,17 +1,16 @@
 use std::sync::Arc;
 
 use crate::{
-    editor::{EditorMessage, EditorMode},
+    editor::{EditorMessage, EditorMode, NoteContents},
     error::Error,
     fs::load_file,
     sidebar::{NoteHeading, SidebarMode},
 };
 
 use iced::{
-    executor,
-    widget::{self, text_editor},
-    Application, Command, Theme,
+    executor, widget::{self, text_editor}, Application, Color, Command, Theme
 };
+use jotdown::parse_jotdown;
 
 pub struct App {
     sidebar_mode: SidebarMode,
@@ -49,6 +48,7 @@ impl Application for App {
     }
 
     fn update(&mut self, message: Self::Message) -> Command<Self::Message> {
+        dbg!(&message);
         match message {
             Message::NotesLoaded(Ok(notes)) => {
                 self.sidebar_mode = SidebarMode::Notes { notes };
@@ -62,9 +62,8 @@ impl Application for App {
                 })
             }),
             Message::NoteOpened(Ok((_note, contents))) => {
-                self.editor_mode = EditorMode::Text {
-                    content: Some(text_editor::Content::with(contents.as_str())),
-                };
+                let parsed = parse_jotdown(&contents).unwrap();
+                self.editor_mode = EditorMode::Note(Some(NoteContents::from(&parsed.1)));
                 Command::none()
             }
             Message::Editor(msg) => self.editor_mode.update(msg),
