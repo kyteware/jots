@@ -1,7 +1,13 @@
 use std::sync::Arc;
 
 use iced::{
-    theme::Checkbox, widget::{self, column, text_editor::{self, Content}, Column, TextEditor}, Command, Element
+    theme::Checkbox,
+    widget::{
+        self, column,
+        text_editor::{self, Content},
+        Column, TextEditor,
+    },
+    Command, Element,
 };
 
 use jotdown::{JdElement, JdTextMod};
@@ -26,7 +32,7 @@ impl EditorMode {
                 }
                 col.into()
             }
-            _ => widget::text("no note :(").into()
+            _ => widget::text("no note :(").into(),
         }
     }
 
@@ -49,10 +55,10 @@ pub enum EditorMessage {
 }
 
 pub struct NoteContents {
-    pub items: Vec<NoteItem>
+    pub items: Vec<NoteItem>,
 }
 
-impl <'a> From<&Vec<JdElement<'a>>> for NoteContents {
+impl<'a> From<&Vec<JdElement<'a>>> for NoteContents {
     fn from(elements: &Vec<JdElement<'a>>) -> Self {
         let mut contents = vec![];
         for element in elements {
@@ -65,7 +71,6 @@ impl <'a> From<&Vec<JdElement<'a>>> for NoteContents {
 pub enum NoteItem {
     Text(Content),
     // Checklist(Vec<Checkbox>)
-
 }
 
 impl<'a> From<&JdElement<'a>> for NoteItem {
@@ -81,13 +86,15 @@ impl<'a> From<&JdElement<'a>> for NoteItem {
                 let mut content = Content::new();
                 for text_mod in mods {
                     match text_mod {
-                        JdTextMod::Normal(text) => content.perform(text_editor::Action::Edit(text_editor::Edit::Paste(Arc::new(text.to_string())))),
-                        _ => todo!()
+                        JdTextMod::Normal(text) => content.perform(text_editor::Action::Edit(
+                            text_editor::Edit::Paste(Arc::new(text.to_string())),
+                        )),
+                        _ => todo!(),
                     }
                 }
                 NoteItem::Text(content)
-            },
-            _ => todo!()
+            }
+            _ => todo!(),
         }
     }
 }

@@ -8,7 +8,9 @@ use crate::{
 };
 
 use iced::{
-    executor, widget::{self, text_editor}, Application, Color, Command, Theme
+    executor,
+    widget::{self},
+    Application, Command, Theme,
 };
 use jotdown::parse_jotdown;
 

@@ -87,7 +87,6 @@ fn reference(input: &str) -> IResult<&str, (&str, &str)> {
 fn normal(input: &str) -> IResult<&str, &str> {
     let (new_input, non_delims) = take_while(|c| c != '*' && c != '`' && c != '[')(input)?;
     let res = if non_delims.is_empty() {
-        dbg!("non_delims is empty");
         take(1usize)(input)?
     } else {
         (new_input, non_delims)
