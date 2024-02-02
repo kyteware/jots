@@ -49,4 +49,5 @@ I took a little break from this to work on some stuff for Wayland, but I'm now w
 ### 2023-2-31
 I DID IT. https://github.com/iced-rs/iced/pull/2221 it was pretty simple in retrospect. I'm now going to get back to my app now :D
 
-
+### 2023-3-1
+I think I'm going to put this project on hold for just a little while. My reasoning for this is that although my plans are solid and I definitly have the skill required to finish my project, the library I'm using, `iced` doesn't support more advanced text editing such as fonts, image embedding, etc. I could probably figure out a solution, but it would be ugly and I would prefer to come up with something useful. I'm going to spend the next little while learning about GPUs, etc.
