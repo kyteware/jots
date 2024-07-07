@@ -1,0 +1,14 @@
+[package]
+name = "jots"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+petgraph = "0.6.5"
+
+[dependencies.iced]
+version = "0.13.0-dev"
+features = ["advanced"]
+
+[patch.crates-io]
+iced = { path = "./iced" }
